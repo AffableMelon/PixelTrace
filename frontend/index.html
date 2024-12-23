@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="src/style/style.css" type="text/css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="src/script/script.js" defer></script>
+    <title>PixelTrace Visualization</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>PixelTrace Data Visualization</h1>
+        <form id="upload-form" action="javascript:void(0);">
+            <input type="file" name="file" required>
+            <button type="submit">Upload</button>
+        </form>
+        <table id="edit-table"></table>
+        <button id="save-changes" style="display: none;">Save Changes</button>
+        <button id="close-edit" style="display: none;">Close Edit</button>
+        <canvas id="chart"></canvas>
+    </div>
+</body>
+
+</html>
