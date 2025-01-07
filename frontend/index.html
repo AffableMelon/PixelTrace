@@ -11,16 +11,49 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>PixelTrace Data Visualization</h1>
-        <form id="upload-form" action="javascript:void(0);">
-            <input type="file" name="file" required>
-            <button type="submit">Upload</button>
-        </form>
-        <table id="edit-table"></table>
-        <button id="save-changes" style="display: none;">Save Changes</button>
-        <button id="close-edit" style="display: none;">Close Edit</button>
-        <canvas id="chart"></canvas>
+    <div class="dashboard">
+        <header class="dashboard-header">
+            <h1>PixelTrace Data Visualization</h1>
+        </header>
+
+        <aside class="dashboard-sidebar">
+            <form id="upload-form" action="javascript:void(0);">
+                <h2>Upload Data</h2>
+                <input type="file" name="file" required>
+                <button type="submit">Upload</button>
+            </form>
+
+            <div id="graph-options" style="display: none;"></div>
+
+            <div id="customizationPanel" style="display: none;">
+                <h2>Chart Customization</h2>
+                <label for="chartTitle">Chart Title:</label>
+                <input id="chartTitle" type="text" placeholder="Enter chart title" />
+
+                <label for="datasetName">Dataset Name:</label>
+                <input id="datasetName" type="text" placeholder="Enter dataset name" />
+
+                <label for="customLabels">Custom Labels (comma-separated):</label>
+                <input id="customLabels" type="text" placeholder="Label1, Label2, ..." />
+
+                <button id="updateChart">Update Chart</button>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <div id="chartContainer" class="chart-section">
+                <canvas id="chart"></canvas>
+            </div>
+
+            <div id="editSection" style="display: none;">
+                <table id="edit-table" class="data-table"></table>
+                <div class="table-controls">
+                    <button id="make-edits" style="display: none;">Make Changes</button>
+                    <button id="save-changes" style="display: none;">Save Changes</button>
+                    <button id="close-edit" style="display: none;">Close Edit</button>
+                </div>
+            </div>
+        </main>
     </div>
 </body>
 

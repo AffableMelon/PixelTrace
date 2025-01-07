@@ -7,6 +7,11 @@ const {
   retriveFile,
   updateFile,
 } = require("../utils/fileparse.js");
+const {
+  classifyAttributes,
+  recommendGraphs,
+  processDataForGraph,
+} = require("../utils/process-data");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -41,8 +46,13 @@ fileRouter.post(
     const [validity, data] = await checkHeadersXLSX(filepath);
 
     console.log("headers are what?", [validity, data], filepath);
-
-    return resp.status(200).json({ validity, data, filename });
+    if (!validity) {
+      return resp.status(200).json({ validity, data, filename });
+    } else {
+      const identify = await classifyAttributes(data);
+      const graphs = await recommendGraphs(identify);
+      return resp.status(200).json({ validity, data, filename, graphs });
+    }
   }
 );
 
@@ -56,12 +66,34 @@ fileRouter.put("/:filepath", requestLogger, async (req, resp) => {
   }
 
   const savedSucces = await updateFile(filepath, datajson);
+  const dataReal = await retriveFile(filepath, true);
+
+  console.log(dataReal);
 
   if (!savedSucces) {
     return resp.status(400).json({ error: "cant find the file" });
   } else {
-    return resp.status(200).json({ sucess: "saved changes" });
+    const identify = await classifyAttributes(dataReal);
+    const graphs = await recommendGraphs(identify);
+    return resp.status(200).json({ sucess: "saved changes", graphs });
   }
+});
+
+fileRouter.post("/process/:filepath", requestLogger, async (req, resp) => {
+  const filepath = req.params.filepath;
+  const data = await retriveFile(`uploads/${req.params.filepath}`);
+
+  // console.log(data);
+  const body = req.body.body;
+
+  const dataProcessed = await processDataForGraph(
+    data,
+    body.pikedGraph,
+    body.value
+  );
+  console.log(dataProcessed);
+
+  return resp.status(200).json({ dataProcessed });
 });
 
 module.exports = fileRouter;

@@ -48,12 +48,14 @@ updateFile = (path, data) => {
   });
 };
 
-retriveFile = (path) => {
+retriveFile = (path, check) => {
   try {
+    console.log(check);
     const workbook = XLSX.readFile(path);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(worksheet);
+    const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
+    console.log(worksheet);
 
     return data;
   } catch (e) {

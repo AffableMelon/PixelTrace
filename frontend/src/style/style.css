@@ -1,31 +1,126 @@
+/* General Styling */
 body {
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
+  color: #333;
 }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  background: #fff;
-  padding: 20px;
+h1, h2 {
+  margin: 0;
+  font-weight: bold;
+}
+
+/* Dashboard Layout */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  gap: 1rem;
+}
+
+.dashboard-header {
+  grid-column: 1 / -1;
+  background: #007bff;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-sidebar {
+  background: #f0f0f0;
+  padding: 1rem;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+.dashboard-main {
+  background: white;
+  padding: 1rem;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Sidebar Styling */
+form, #customizationPanel {
+  margin-bottom: 2rem;
+}
+
+input[type="file"], input[type="text"], button {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+/* Chart Section */
+.chart-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150%;
+}
+
+canvas {
+  max-width: 140%;
+  max-height: 140%;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+/* Table Section */
+#editSection {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
   text-align: center;
 }
 
-input[type="file"],
-select,
-button {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
+.data-table th {
+  background-color: #007bff;
+  color: white;
 }
 
-#chart {
-  margin-top: 30px;
+.data-table td {
+  background-color: #f9f9f9;
+}
+
+.table-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
