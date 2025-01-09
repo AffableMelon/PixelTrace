@@ -1,43 +1,3 @@
-// const data = [
-//   { year: 2010, count: 10 },
-//   { year: 2011, count: 20 },
-//   { year: 2012, count: 15 },
-//   { year: 2013, count: 25 },
-//   { year: 2014, count: 22 },
-//   { year: 2015, count: 30 },
-//   { year: 2016, count: 28 },
-// ];
-
-// data = [
-//   { Name: "Student_1", Gender: "Female", Age: 23 },
-//   { Name: "Student_2", Gender: "Female", Age: 22 },
-//   { Name: "Student_3", Gender: "Female", Age: 18 },
-//   { Name: "Student_4", Gender: "Female", Age: 22 },
-//   { Name: "Student_5", Gender: "Female", Age: 19 },
-//   { Name: "Student_6", Gender: "Female", Age: 25 },
-//   { Name: "Student_7", Gender: "Male", Age: 21 },
-//   { Name: "Student_8", Gender: "Male", Age: 23 },
-//   { Name: "Student_9", Gender: "Male", Age: 23 },
-//   { Name: "Student_10", Gender: "Male", Age: 21 },
-//   { Name: "Student_11", Gender: "Female", Age: 23 },
-//   { Name: "Student_12", Gender: "Female", Age: 18 },
-//   { Name: "Student_13", Gender: "Female", Age: 18 },
-//   { Name: "Student_14", Gender: "Female", Age: 22 },
-//   { Name: "Student_15", Gender: "Male", Age: 25 },
-//   { Name: "Student_16", Gender: "Female", Age: 21 },
-//   { Name: "Student_17", Gender: "Female", Age: 21 },
-//   { Name: "Student_18", Gender: "Male", Age: 23 },
-//   { Name: "Student_19", Gender: "Male", Age: 22 },
-//   { Name: "Student_20", Gender: "Female", Age: 25 },
-// ];
-
-// data = [
-//   { Name: "Student_1", Gender: "Female", Age: 23 },
-//   { Name: "Student_2", Gender: "Female", Age: 22 },
-//   { Name: "Student_3", Gender: "Female", Age: 18 },
-//   { Name: "Student_4", Gender: "Female", Age: 22 },
-// ];
-
 const classifyAttributes = (data) => {
   if (data.length === 0) return {};
 
@@ -105,12 +65,6 @@ const classifyAttributes = (data) => {
   return result;
 };
 
-// const attributes = { Gender: "categorical" };
-//     const result = recommendGraphs(attributes);
-
-//     expect(result).toEqual({
-//       Gender: ["Bar Chart", "Pie Chart"],
-//     });
 const recommendGraphs = (data) => {
   // const attrs = Object.values(data);
   const keys = Object.keys(data);
@@ -276,90 +230,62 @@ const processDataForGraph = (data, pickedGraph, keys) => {
   return result;
 };
 
-// const data3 = [
-//   { X: 1, Y: 5 },
-//   { X: 2, Y: 10 },
-//   { X: 3, Y: 15 },
-// ];
+// Backend logic for generating summaries
+const summarizeData = (data, dataTypes) => {
+  const summaries = {};
 
-// const result = processDataForGraph(data3, "line", ["X", "Y"]);
-// const data4 = [{ Gender: "Male" }, { Gender: "Female" }, { Gender: "Male" }];
-// console.log(processDataForGraph(data4, "bar", ["Gender"]));
+  for (const column in dataTypes) {
+    const type = dataTypes[column];
+    const values = data.map((row) => row[column]);
 
-// processDataForGraph(data, "line", ["Gender_1"]);
+    if (type === "categorical") {
+      // Calculate frequencies for categorical columns
+      const frequencies = values.reduce((acc, value) => {
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      }, {});
 
-// console.log(res);
+      const total = values.length;
+      summaries[column] = Object.entries(frequencies).map(([key, count]) => {
+        return {
+          value: key,
+          frequency: count,
+          percentage: ((count / total) * 100).toFixed(2) + "%",
+        };
+      });
+    } else if (type === "numerical") {
+      // Calculate mean, median, and mode for numerical columns
+      const numericValues = values.map(Number).filter((v) => !isNaN(v));
+      const total = numericValues.length;
 
-// const processDataForGraph = (data, pickedGraph, keys) => {
-//   let result = {
-//     labels: [],
-//     data: [],
-//   };
+      const mean = (
+        numericValues.reduce((sum, v) => sum + v, 0) / total
+      ).toFixed(2);
 
-//   if (
-//     pickedGraph === "bar" ||
-//     pickedGraph === "pie" ||
-//     pickedGraph === "donut"
-//   ) {
-//     const key = keys[0]; // Assuming the first key is the category
-//     const valueKey = keys[1]; // Assuming the second key is the value
+      const sorted = [...numericValues].sort((a, b) => a - b);
+      const median =
+        total % 2 === 0
+          ? ((sorted[total / 2 - 1] + sorted[total / 2]) / 2).toFixed(2)
+          : sorted[Math.floor(total / 2)].toFixed(2);
 
-//     const groupedData = data.reduce((acc, item) => {
-//       const category = item[key];
-//       const value = item[valueKey];
+      const modeMap = numericValues.reduce((acc, value) => {
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      }, {});
+      const maxFrequency = Math.max(...Object.values(modeMap));
+      const modes = Object.entries(modeMap)
+        .filter(([_, freq]) => freq === maxFrequency)
+        .map(([value]) => Number(value));
 
-//       if (!acc[category]) {
-//         acc[category] = 0;
-//       }
-//       acc[category] += value;
-//       return acc;
-//     }, {});
+      summaries[column] = { mean, median, mode: modes };
+    }
+  }
 
-//     result.labels = Object.keys(groupedData);
-//     result.data = Object.values(groupedData);
-//   } else if (pickedGraph === "histogram") {
-//     const valueKey = keys[0]; // Assuming the first key is the value
-
-//     const groupedData = data.reduce((acc, item) => {
-//       const value = item[valueKey];
-
-//       if (!acc[value]) {
-//         acc[value] = 0;
-//       }
-//       acc[value] += 1;
-//       return acc;
-//     }, {});
-
-//     result.labels = Object.keys(groupedData);
-//     result.data = Object.values(groupedData);
-//   } else if (pickedGraph === "line" || pickedGraph === "scatterplot") {
-//     const xKey = keys[0]; // Assuming the first key is the x-axis
-//     const yKey = keys[1]; // Assuming the second key is the y-axis
-
-//     result.data = data.map((item) => ({
-//       x: item[xKey],
-//       y: item[yKey],
-//     }));
-//   }
-
-//   return result;
-// };
-
-// const data = [
-//   { Category: "A", Value: 10 },
-//   { Category: "B", Value: 15 },
-//   { Category: "A", Value: 5 },
-// ];
-// const hmm = classifyAttributes(data);
-// console.log(hmm);
-// const hmm2 = recommendGraphs(hmm);
-// // const finalhmm = processDataForGraph(data, "line", "Age");
-// const finalhmm = processDataForGraph(data, "grouped-bar", [
-//   "Category",
-//   "Value",
-// ]);
-// console.log(finalhmm);
-// console.log(finalhmm.data[0].data);
-
-// console.log(hmm2);
-module.exports = { classifyAttributes, recommendGraphs, processDataForGraph };
+  return summaries;
+};
+module.exports = {
+  classifyAttributes,
+  recommendGraphs,
+  processDataForGraph,
+  summarizeData,
+};

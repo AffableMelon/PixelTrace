@@ -11,6 +11,7 @@ const {
   classifyAttributes,
   recommendGraphs,
   processDataForGraph,
+  summarizeData,
 } = require("../utils/process-data");
 
 const upload = multer({ dest: "uploads/" });
@@ -94,6 +95,37 @@ fileRouter.post("/process/:filepath", requestLogger, async (req, resp) => {
   console.log(dataProcessed);
 
   return resp.status(200).json({ dataProcessed });
+});
+
+fileRouter.post("/summarize", requestLogger, async (req, resp) => {
+  const filepath = `uploads/${req.body.filepath}`;
+  // console.log(req.body);
+
+  if (!filepath) {
+    return resp.status(400).json({ error: "Filepath is required." });
+  }
+
+  try {
+    const data = await retriveFile(filepath, true);
+    const types = await classifyAttributes(data);
+
+    // console.log()
+
+    if (!data) {
+      return resp.status(404).json({ error: "File not found or empty." });
+    }
+
+    const summary = await summarizeData(data, types);
+
+    if (!summary) {
+      return resp.status(500).json({ error: "Failed to summarize data." });
+    }
+
+    return resp.status(200).json({ summary });
+  } catch (error) {
+    console.error("Error in /summarize endpoint:", error);
+    return resp.status(500).json({ error: "Internal Server Error." });
+  }
 });
 
 module.exports = fileRouter;

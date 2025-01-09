@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="src/style/style.css" type="text/css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="src/script/script.js" defer></script>
+    <script type="module" src="src/script/script.js" defer></script>
     <title>PixelTrace Visualization</title>
 </head>
 
@@ -38,6 +38,10 @@
 
                 <button id="updateChart">Update Chart</button>
             </div>
+
+
+            <button id="exportPdf" style="display: none;">Export as PDF</button>
+
         </aside>
 
         <main class="dashboard-main">
@@ -55,6 +59,11 @@
             </div>
         </main>
     </div>
+
+
+
+
+
 </body>
 
 </html>

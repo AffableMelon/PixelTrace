@@ -8,6 +8,8 @@ const updateChartButton = document.getElementById("updateChart");
 const chartTitleInput = document.getElementById("chartTitle");
 const datasetNameInput = document.getElementById("datasetName");
 const customLabelsInput = document.getElementById("customLabels");
+const exportPdfButton = document.getElementById("exportPdf");
+import { jsPDF } from "jspdf";
 
 let filename = "";
 let fileContent = null;
@@ -297,6 +299,7 @@ function renderChart(graphType, dP, title) {
 
   const customize = document.getElementById("customizationPanel");
   customize.style.display = "block";
+  document.getElementById("exportPdf").style.display = "block";
 }
 
 function generateColors(length) {
@@ -442,6 +445,98 @@ updateChartButton.addEventListener("click", () => {
     }
   }
 
-  // Re-render the chart with updated options and data
   window.currentChart.update();
 });
+
+document.getElementById("exportPdf").addEventListener("click", async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/file/summarize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filepath: filename }),
+    });
+    const { summary } = await response.json();
+    const chart = document.getElementById("chart");
+
+    exportSummaryAsPDF(summary, chart);
+  } catch (error) {
+    console.error("Error exporting PDF:", error);
+    alert("Failed to export PDF. Please try again.");
+  }
+});
+
+function exportSummaryAsPDF(summary, chartCanvas) {
+  const doc = new jsPDF();
+
+  // Add title
+  doc.setFontSize(16);
+  doc.text("Data Summary and Chart", 10, 10);
+
+  // Vertical offset for the content
+  let y = 20;
+
+  // Function to handle page overflow
+  const checkPageOverflow = (currentY, additionalHeight) => {
+    if (currentY + additionalHeight > 280) {
+      // Adjust for bottom margin
+      doc.addPage();
+      return 10; // Reset to top margin
+    }
+    return currentY;
+  };
+
+  // Add categorical summaries
+  for (const [column, details] of Object.entries(summary)) {
+    if (Array.isArray(details)) {
+      // Categorical data (frequency and percentage)
+      doc.setFontSize(14);
+      y = checkPageOverflow(y, 10);
+      doc.text(`Column: ${column}`, 10, y);
+      y += 10;
+
+      doc.setFontSize(12);
+      for (const item of details) {
+        y = checkPageOverflow(y, 10);
+        doc.text(
+          `Value: ${item.value}, Frequency: ${item.frequency}, Percentage: ${item.percentage}`,
+          10,
+          y
+        );
+        y += 10;
+      }
+    } else if (typeof details === "object") {
+      // Numerical data (mean, median, mode)
+      doc.setFontSize(14);
+      y = checkPageOverflow(y, 10);
+      doc.text(`Column: ${column}`, 10, y);
+      y += 10;
+
+      doc.setFontSize(12);
+      y = checkPageOverflow(y, 10);
+      doc.text(`Mean: ${details.mean}`, 10, y);
+      y += 10;
+
+      y = checkPageOverflow(y, 10);
+      doc.text(`Median: ${details.median}`, 10, y);
+      y += 10;
+
+      y = checkPageOverflow(y, 10);
+      const modeText =
+        details.mode && details.mode.length > 0
+          ? details.mode.join(", ")
+          : "None";
+      doc.text(`Mode: ${modeText}`, 10, y);
+      y += 10;
+    }
+  }
+
+  // Add chart
+  if (chartCanvas) {
+    const chartImage = chartCanvas.toDataURL("image/png");
+    y = checkPageOverflow(y, 100); // Account for chart height
+    doc.addImage(chartImage, "PNG", 10, y, 180, 100);
+  }
+
+  // Save the PDF
+  doc.save("summary_and_chart.pdf");
+}

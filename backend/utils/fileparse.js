@@ -55,7 +55,7 @@ retriveFile = (path, check) => {
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
-    console.log(worksheet);
+    // console.log(worksheet);
 
     return data;
   } catch (e) {
